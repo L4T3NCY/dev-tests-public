@@ -1,0 +1,35 @@
+:root{color-scheme:dark;font-family:system-ui,sans-serif;color:#f4ddd0;background:#111322}
+*{box-sizing:border-box}
+html,body,main{margin:0;width:100%;height:100%;overflow:hidden}
+main{position:relative}
+canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+header,footer,nav,#ui,#status{position:absolute}
+header{top:clamp(18px,4.3vh,48px);left:clamp(18px,4vw,65px);pointer-events:none}
+.back{pointer-events:auto;color:#e3a2a1;text-decoration:none;font-size:.76rem;letter-spacing:.1em}
+h1{margin:15px 0 0;font:400 clamp(29px,4vw,60px)/.94 Georgia,serif;max-width:6ch;text-shadow:0 4px 26px #090b16}
+h1 em{font-weight:400;color:#ffb2a0}
+nav{bottom:clamp(64px,10vh,102px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px}
+.views{display:flex;gap:3px;padding:3px;border:1px solid #bb81814d;border-radius:7px;background:#151321de}
+button{font:inherit;font-size:.75rem;color:#f4ddd0;padding:8px 11px;background:#171422de;border:1px solid #bb81814d;border-radius:5px;white-space:nowrap;cursor:pointer}
+.views button{border-color:transparent;background:transparent}
+button:hover,.views button[aria-pressed=true]{border-color:#cc929177;background:#6937439e}
+button:focus-visible,.back:focus-visible{outline:2px solid #ffd5bc;outline-offset:4px}
+footer{bottom:clamp(12px,3vh,32px);left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;color:#f2d1c9;font-size:.71rem;text-shadow:0 1px 7px #080912}
+footer span{padding:0 4px;color:#eb9398}
+.flight-help{margin-bottom:5px;font-size:.76rem;color:#f6e0d7}
+kbd{display:inline-block;padding:1px 4px;margin-right:3px;font:inherit;font-weight:650;border:1px solid #c8909780;border-radius:3px;background:#231522d9;line-height:1.1}
+#ui{right:clamp(10px,3.5vw,45px);bottom:clamp(12px,2.8vh,30px)}
+#status{inset:0;margin:0;display:grid;place-items:center;text-align:center;padding:24px;background:#111322;color:#f4ddd0;pointer-events:none}
+#status[hidden],.clean .interface{display:none}
+@media(max-width:600px){
+  h1{margin-top:8px;font-size:32px}
+  nav{bottom:65px;gap:5px}
+  button{padding:7px 8px;font-size:.68rem}
+  footer{left:10px;transform:none;font-size:.62rem;text-align:left}
+  footer span{padding:0 1px}
+}
+@media(max-width:360px){
+  footer{max-width:220px;white-space:normal}
+  .views button{padding-left:5px;padding-right:5px}
+}
