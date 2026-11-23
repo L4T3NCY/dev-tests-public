@@ -10,6 +10,7 @@ import {makeAtmosphere} from './atmosphere.js';
 import {makeMotion} from './motion.js';
 import {makePlayer,angleDelta} from './player.js';
 import {makeCameraEase} from './camera-ease.js';
+import {makeFlightStick} from './flight-stick.js';
 import {makeArrivalCamera} from './arrival-camera.js';
 import {makeRoseGarden} from './garden.js';
 import {makeFountain} from './fountain.js';
@@ -172,6 +173,8 @@ async function launch() {
 
   let elapsed=0, previous=performance.now(),paused=false;
   const keys=new Set();
+  const flightStick=makeFlightStick($('flight-stick'));
+  const inFlight=()=>siege.game.phase==='wave'||siege.game.phase==='breather';
   const flightKeys=new Set(['KeyW','KeyA','KeyS','KeyD']);
   const held=code=>Number(keys.has(code));
   let renderScale=1, averageFrame=16.7, qualityClock=0, fastTime=0;
@@ -215,6 +218,8 @@ async function launch() {
   function setPaused(value) {
     paused=value;
     keys.clear();
+    flightStick.reset();
+    flightStick.setEnabled(!paused&&inFlight());
     $('motion').setAttribute('aria-pressed',String(paused));
     $('motion').textContent=paused?'Play':'Pause';
   }
@@ -230,6 +235,7 @@ async function launch() {
     followAngle=Math.atan2(center.x,center.z);
     useView('follow');
     siege.start();
+    flightStick.setEnabled(true);
   }
   $('motion').addEventListener('click',()=>setPaused(!paused));
   $('begin').addEventListener('click',restart);
@@ -250,12 +256,13 @@ async function launch() {
     if(event.key==='Escape'||event.key==='1')useView('overview');
   });
   window.addEventListener('keyup',event=>keys.delete(event.code));
-  window.addEventListener('blur',()=>keys.clear());
+  window.addEventListener('blur',()=>{keys.clear();flightStick.reset();});
   document.addEventListener('visibilitychange',()=>{
-    if(document.hidden){keys.clear();if(siege.game.phase==='wave')setPaused(true);}
+    if(document.hidden){keys.clear();flightStick.reset();if(inFlight())setPaused(true);}
   });
   $('scene').addEventListener('webglcontextlost',event=>{
     event.preventDefault();
+    flightStick.setEnabled(false);
     renderer.setAnimationLoop(null);
     $('status').hidden=false;
     $('status').textContent='The graphics context was interrupted. Reload to restart the diorama.';
@@ -268,9 +275,13 @@ async function launch() {
     if($('status').hidden)tuneResolution(frameMs);
     if(!paused){
       elapsed+=delta;
-      const flying=siege.game.phase==='wave'||siege.game.phase==='breather';
-      player.update(flying?held('KeyD')-held('KeyA'):0,flying?held('KeyW')-held('KeyS'):0,elapsed,delta);
+      const flying=inFlight();
+      const {along,vertical}=flightStick.axes;
+      const turn=THREE.MathUtils.clamp(held('KeyD')-held('KeyA')+along,-1,1);
+      const climb=THREE.MathUtils.clamp(held('KeyW')-held('KeyS')+vertical,-1,1);
+      player.update(flying?turn:0,flying?climb:0,elapsed,delta);
       siege.update(delta,player.position);
+      flightStick.setEnabled(inFlight());
       const charge=siege.game.channel?.progress??0;
       effects.channel(player.position,charge,elapsed);
       effects.update(delta,elapsed);

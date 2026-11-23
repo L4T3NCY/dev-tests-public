@@ -10,6 +10,7 @@ const shortest=(a,b)=>THREE.MathUtils.euclideanModulo(b-a+Math.PI,Math.PI*2)-Mat
 export function makeSiegeHud() {
   const holder=$('marks');
   const panel=$('threat');
+  const touch=matchMedia('(any-pointer:coarse)');
   const limit=12;
   const markers=Array.from({length:limit},()=>{
     const node=document.createElement('div');
@@ -79,8 +80,8 @@ export function makeSiegeHud() {
       const turn=shortest(yaw(player),yaw(targetPosition));
       const dy=targetPosition.y-player.y;
       const near=target?siege.canReach(target,player):false;
-      const along=Math.abs(turn)<.24?'':turn>0?'D →':'← A';
-      const vertical=dy>1.55?'W ↑':dy< -1.55?'S ↓':'';
+      const along=Math.abs(turn)<.24?'':turn>0?(touch.matches?'→':'D →'):(touch.matches?'←':'← A');
+      const vertical=dy>1.55?(touch.matches?'↑':'W ↑'):dy< -1.55?(touch.matches?'↓':'S ↓'):'';
       panel.classList.toggle('latched',target?.phase==='latched');
       panel.classList.toggle('near',near);
       const charging=game.channel?.target===target&&!!target;
